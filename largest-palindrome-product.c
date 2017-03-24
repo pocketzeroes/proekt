@@ -1,4 +1,4 @@
-private int reverse(int n, int dig){
+int reverse(int n, int dig){
     int x   = n;
     int res = 0;
     int ten = (int)pow(10,dig-1);
