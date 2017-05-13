@@ -1,22 +1,24 @@
-/*
-test 16 not ok
-*/
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
 #include<math.h>
-#include<stdint.h>
 #include<limits.h>
+typedef long long ll;
+
+void swap(ll*nums, int i, int j) {
+   ll  t   = nums[i];
+   nums[i] = nums[j];
+   nums[j] = t;
+}
 
 #define resizeArray(ptr, type, size) ((type*)realloc(ptr, (size) * sizeof(type)))
-int *pushback(int *array, int *size, int value) {
-    int *output = resizeArray(array, int, *size + 1);
+ll *pushback(ll *array, int *size, ll value) {
+    ll *output = resizeArray(array, ll, *size + 1);
     output[(*size)++] = value;
     return output;
 }
-
 typedef struct vecS {
-	int*ptr;
+	ll*ptr;
 	int sz;
 }vec;
 vec newVec() {
@@ -26,81 +28,46 @@ vec newVec() {
 	return rez;
 }
 
-  
-int32_t cmp (const void * a, const void * b)
-{
-   return ( *(int*)a - *(int*)b );
-}  
+#define SIZE 100005
+vec result;
 
-int n1, n2;
-
-vec first ;
-vec second;
-vec ans;
-    
-void read(){
-    scanf("%d %d", &n1, &n2);
-    for (int i = 0; i < n1; ++i) {
-        int val;
-        scanf("%d", &val);
-        first.ptr=pushback(first.ptr, &first.sz, val);
-    }
-    for (int i = 0; i < n2; ++i) {
-        int val;
-        scanf("%d", &val);
-        second.ptr=pushback(second.ptr, &second.sz, val);
-    }
+vec hash_map[SIZE];
+void insert(ll element){
+  int line = llabs(element) % SIZE;
+  hash_map[line].ptr=pushback(hash_map[line].ptr, &hash_map[line].sz,element);
 }
-void arrayIntersection(vec f, vec s){
-    int i = 0, j = 0;
-    while (i < f.sz && j < s.sz){
-        if      (f.ptr[i] > s.ptr[j]) j++;
-        else if (f.ptr[i] < s.ptr[j]) i++;
-        else {
-            ans.ptr=pushback(ans.ptr, &ans.sz, f.ptr[i]);
-            i++; j++;
-        }
+void do_remove(ll element){
+  int line = llabs(element) % SIZE;
+  for (size_t i = 0; i < hash_map[line].sz; i++) {
+    if (element == hash_map[line].ptr[i]) {
+      result.ptr=pushback(result.ptr, &result.sz, element);
+      swap(hash_map[line].ptr, i, hash_map[line].sz-1);
+      hash_map[line].sz--;
+      break;
     }
-}
-int32_t main() {
-    read();
-    qsort(first.ptr,  first.sz,  sizeof(int), cmp);
-    qsort(second.ptr, second.sz, sizeof(int), cmp);
-    arrayIntersection(first, second);
-    printf("%d\n", ans.sz);
-    for(int i=0;i<ans.sz;i++)
-        printf("%d ", ans.ptr[i]);
-    puts("");
+  }
 }
 
+int n, m;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+int main(){
+  scanf("%d %d", &n, &m);
+  for (int i = 0; i < n; i += 1) {
+    long long element;
+    scanf("%lld", &element);
+    insert(element);
+  }
+  for (int i = 0; i < m; i += 1) {
+    long long element;
+    scanf("%lld", &element);
+    do_remove(element);
+  }
+  printf("%d\n", result.sz);
+  for(int i=0;i<result.sz;i++){
+    printf("%d ", result.ptr[i]);
+  }
+  puts("");
+}
 
 
 
