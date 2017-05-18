@@ -1,3 +1,4 @@
+/*test 25 KO*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -196,20 +197,20 @@ vec newVec() {
 /////
 
 
-char buff[100000];
+char buff[10000];
 int main() {
   int N, M;
   scanf("%d %d", &N, &M);
   do {
-    char* rname[N];
-    vec ce[M + 1]; memset(ce, 0, sizeof(ce));
-    ll cmin[M + 1]; for (int i = 0; i<M + 1; i++)cmin[i] = (ll)1e18;
-    ll rret[N];
-    int rc[N];
-    int rd[N];
-    int cn[M + 1];
-    int cc[M + 1];
-    int cd[M + 1];
+    char**rname=malloc(N*sizeof(char*));
+    vec*ce =malloc((M+1)*sizeof(vec)); memset(ce, 0, (M+1)*sizeof(vec));
+    ll*cmin=malloc((M+1)*sizeof(ll)); for (int i = 0; i<M + 1; i++)cmin[i] = (ll)1e18;
+    ll*rret=malloc(N*sizeof(ll));
+    int*rc=malloc(N*sizeof(int));
+    int*rd=malloc(N*sizeof(int));
+    int*cn=malloc((M+1)*sizeof(int));
+    int*cc=malloc((M+1)*sizeof(int));
+    int*cd=malloc((M+1)*sizeof(int));
     PriorityQueue*event = newPriorityQueue(coompP);
     for (int i = 0; i < N; i++) {
       scanf("%s %d %d", &buff, &rc[i], &rd[i]);
