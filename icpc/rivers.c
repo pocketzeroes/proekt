@@ -10,7 +10,6 @@ ll max(ll a, ll b) { return a>b ? a : b; }
 #else
   #define strdup _strdup
 #endif
-
 typedef struct pair {
   ll  first;
   int second;
@@ -27,7 +26,6 @@ pair newPair2(ll a, int b) {
   rez.second = b;
   return rez;
 }
-
 #ifndef __HEAP_H_GUARD__
 #define __HEAP_H_GUARD__
 #define HEAP_STARTING_SIZE 256
@@ -156,20 +154,16 @@ void delPriorityQueue(PriorityQueue** h, void(*freeFunction)(void*)) {
 int size(PriorityQueue*h) {
   return h->used;
 }
-
 int coompP(void*pa, void*pb)
 {
   pair*a = (pair*)pa;
   pair*b = (pair*)pb;
-  ll diff;
-  diff = a->first - b->first;  if (diff != 0) return(int) diff;
-  return a->second - b->second;
+  if(a->first == b->first)return (a->second < b->second)?-1:1;
+  return (a->first < b->first)?-1:1;
 }
 int cmpP(const void*pa, const void*pb) {
   return coompP((void*)pa, (void*)pb);
 }
-
-
 #define resizeArray(ptr, type, size) ((type*)realloc(ptr, (size) * sizeof(type)))
 int *pushback(int *array, int *size, int value) {
   int *output = resizeArray(array, int, *size + 1);
@@ -181,8 +175,6 @@ pair*pushbackP(pair*array, int *size, pair value) {
   output[(*size)++] = value;
   return output;
 }
-
-
 typedef struct vecS {
   int*ptr;
   int sz;
@@ -193,10 +185,7 @@ vec newVec() {
   rez.sz = 0;
   return rez;
 }
-
 /////
-
-
 char buff[10000];
 int main() {
   int N, M;
@@ -262,6 +251,38 @@ int main() {
       printf("%s %lld\n", rname[i], rret[i]);
   } while (0);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
