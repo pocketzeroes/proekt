@@ -1,5 +1,5 @@
 /*
-test 53 tle
+accepted
 */
 #pragma GCC optimize "-O3"
 #include<stdio.h>
@@ -10,37 +10,36 @@ test 53 tle
 #include<limits.h>
 
 #ifndef min
-double min(double a, double b) { return a<b ? a : b; }
-double max(double a, double b) { return a>b ? a : b; }
+inline double min(double a, double b) { return a<b ? a : b; }
+inline double max(double a, double b) { return a>b ? a : b; }
 #endif
 
 typedef struct TPointS {
 	double x, y;
 }TPoint;
 
-TPoint newPoint(double x, double y) {
+inline TPoint newPoint(double x, double y) {
 	TPoint rez;
 	rez.x = x;
 	rez.y = y;
 	return rez;
 }
-
-TPoint operatorAdd(TPoint a, TPoint b) {
+inline TPoint operatorAdd(TPoint a, TPoint b) {
 	return newPoint(a.x + b.x, a.y + b.y);
 }
-TPoint operatorSub(TPoint a, TPoint b) {
+inline TPoint operatorSub(TPoint a, TPoint b) {
 	return newPoint(a.x - b.x, a.y - b.y);
 }
-double operatorMul(TPoint a, TPoint b) {
+inline double operatorMul(TPoint a, TPoint b) {
 	return a.x*b.x + a.y*b.y;
 }
-TPoint operatorTms(TPoint a, double t) {
+inline TPoint operatorTms(TPoint a, double t) {
 	return newPoint(t*a.x, t*a.y);
 }
-double operatorMod(TPoint a, TPoint b) {
+inline double operatorMod(TPoint a, TPoint b) {
 	return a.x*b.y - a.y*b.x;
 }
-double operatorSqr(TPoint a) {
+inline double operatorSqr(TPoint a) {
 	return sqrt(operatorMul(a, a));
 }
 
@@ -54,7 +53,7 @@ typedef struct vecS {
 	TPoint*ptr;
 	int sz;
 }vec;
-vec newVec() {
+inline vec newVec() {
 	vec rez;
 	rez.ptr = NULL;
 	rez.sz = 0;
