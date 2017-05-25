@@ -1,4 +1,3 @@
-/*test 25 KO*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
