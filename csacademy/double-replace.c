@@ -23,11 +23,11 @@ int main(){
 	for(int i=0;i < ssize;){
 		char*t = substr(s, i, l);
 		if(strcmp(t, a)==0){
-			puts(b);
+			printf("%s", b);
 			i+=l;
 		}
 		else if(strcmp(t, b)==0){
-			puts(a);
+			printf("%s", a);
 			i+=l;
 		}
 		else{
