@@ -5,13 +5,6 @@
 #include<stdbool.h>
 #include<limits.h>
 
-#define swap(a,b) do\
-    {\
-      a ^= b;\
-      b ^= a;\
-      a ^= b;\
-    } while (0)
-
 #define resizeArray(ptr, type, size) ((type*)realloc(ptr, (size) * sizeof(type)))
 int *pushback(int *array, int *size, int value) {
     int *output = resizeArray(array, int, *size + 1);
@@ -39,125 +32,193 @@ pair newPair(int a, int b){
     rez.second=b;
     return rez;
 }
+pair*pushbackP(pair *array, int *size, pair value) {
+    pair *output = resizeArray(array, pair, *size + 1);
+    output[(*size)++] = value;
+    return output;
+}
+typedef struct{
+	pair*ptr;
+	int sz;
+}vecp;
+vecp newVecP() {
+	vecp rez;
+	rez.ptr = NULL;
+	rez.sz  = 0;
+	return rez;
+}
 
 /////////////////
-typedef long long ll;
-enum{ N = 10000};
-int dp[15][N];
-int n;
-int m;
+enum{ N=10050};
+enum{ M=2*N  };
+vec x[M],y[M];
+int ls[M], rs[M], clock, root[N];
+int sol;
+bool done[N*25];
+vec E[N];
 int p[N];
-vec*g;
-pair e  [25000];
-int  d  [N];
-vec  rep[N];
-bool vis[25000];
-int  res;
+int par[N][15], dep[N], gsz[N];
+int Chain[N], Index[N], time, CS[N];
+vec Head;
+vecp edges;
 
 
-int find(int u){
-    if (p[u] == u)
-        return u;
-    return p[u] = find(p[u]);
+
+void Set(int*c, int ss, int se, int qs, int qe, int X){
+    if(qs>qe)
+        return;
+    if(ss>qe || qs>se)
+        return;
+    if(!*c)
+        *c=++clock;
+    y[*c].ptr = pushback(y[*c].ptr, &y[*c].sz, X);
+    if(qs<=ss && qe>=se){
+        x[*c].ptr = pushback(x[*c].ptr, &x[*c].sz, X);
+        return;
+    }
+    int mid = ss+se>>1;
+    Set(&ls[*c], ss  , mid, qs, qe, X);
+    Set(&rs[*c], mid+1, se, qs, qe, X);
+}
+void Get(int c, int ss, int se, int qs, int qe){
+    if(qs>qe)
+        return;
+    if(ss>qe || qs>se)
+        return;
+    while(x[c].sz && done[x[c].ptr[x[c].sz-1]])
+        x[c].sz--;
+    while(y[c].sz && done[y[c].ptr[y[c].sz-1]])
+        y[c].sz--;
+    if(qs<=ss && qe>=se){
+        if(y[c].sz)
+            sol=y[c].ptr[y[c].sz-1];
+        return;
+    }
+    if(x[c].sz)
+        sol=x[c].ptr[x[c].sz-1];
+    int mid=ss+se>>1;
+    Get(ls[c], ss,mid,qs,qe);
+    Get(rs[c], mid+1,se,qs,qe);
+}
+int Find(int x){
+    if(p[x]==x)
+        return x;
+    else{
+        p[x]=Find(p[x]);
+        return p[x];
+    }
+}
+void Union(int x, int y){
+    p[Find(x)]=Find(y);
 }
 void DFS(int u, int p){
-    dp[0][u] = p;
-    for (int i = 0; i<g[u].sz; ++i)
-        if(g[u].ptr[i] != p) {
-            d[g[u].ptr[i]] = d[u] + 1;
-            DFS(g[u].ptr[i], u);
-        }
-}
-int LCA(int a, int b){
-    if (d[a] < d[b])
-        swap(a, b);
-    int l = 0;
-    while ((1 << l) <= d[a])
-        ++l;
-    --l;
-    for (int i = l; i >= 0; --i)
-        if (d[a] - (1 << i) >= d[b])
-            a = dp[i][a];
-    if (a == b)
-        return a;
-    for (int i = l; i >= 0; --i)
-        if (dp[i][a] != dp[i][b]) {
-            a = dp[i][a];
-            b = dp[i][b];
-        }
-    return dp[0][a];
-}
-void add(int u, int p, int e){
-    int *parent = dp[0];
-    while (u != p){
-        rep[u].ptr = pushback(rep[u].ptr, &rep[u].sz, e);
-        u = parent[u];
+    gsz[u]=1;
+    dep[u]=dep[p]+1;
+    par[u][0]=p;
+    for(int i=1;i<15;i++)
+        par[u][i]=par[par[u][i-1]][i-1];
+    for(int z=0;z<E[u].sz;z++){int v=E[u].ptr[z];
+        if(v!=p)
+            DFS(v,u), gsz[u]+=gsz[v];
     }
 }
-bool rem(int u, int p){
-    int *parent = dp[0];
-    while(u != p){
-        while(rep[u].sz>0){
-#define rep_u_back rep[u].ptr[rep[u].sz-1]
-            if (vis[rep_u_back])
-                rep[u].sz--;
-            else{
-                res = rep_u_back;
-                rep[u].sz--;
-                vis[res] = true;
-                return true;
-            }
-        }
-        u = parent[u];
+int LCA(int u, int v){
+    if(dep[u]<dep[v])
+        return LCA(v,u);
+    int i;
+    for(i=14;~i;i--)
+        if(dep[par[u][i]]>=dep[v])
+            u=par[u][i];
+    for(i=14;~i;i--)
+        if(par[u][i]!=par[v][i])
+            u=par[u][i],v=par[v][i];
+    if(u==v)
+        return v;
+    return par[v][0];
+}
+void HLD(int u, int p){
+    if(!Chain[u]){
+        Chain[u] = Head.sz;
+        Head.ptr = pushback(Head.ptr, &Head.sz, u);
+        time=0;
     }
-    return false;
+    Index[u]=++time;
+    CS[Chain[u]]=time;
+    int HC=0;
+    for(int z=0;z<E[u].sz;z++){int v=E[u].ptr[z];
+        if(v!=p && gsz[v]>gsz[HC])
+            HC=v;
+    }
+    if(HC){
+        Chain[HC]=Chain[u];
+        HLD(HC,u);
+        for(int z=0;z<E[u].sz;z++){int v=E[u].ptr[z];
+            if(v!=p && v!=HC)
+                HLD(v,u);
+        }
+    }
+}
+void Set3(int u, int v, int X){
+    int lca=LCA(u,v);
+    while(Chain[u]!=Chain[lca]){
+        Set(&root[Chain[u]], 1, CS[Chain[u]], 1, Index[u], X);
+        u=par[Head.ptr[Chain[u]]][0];
+    }
+    Set(&root[Chain[u]], 1, CS[Chain[u]], Index[lca]+1, Index[u], X);
+    while(Chain[v]!=Chain[lca]){
+        Set(&root[Chain[v]], 1, CS[Chain[v]], 1, Index[v], X);
+        v=par[Head.ptr[Chain[v]]][0];
+    }
+    Set(&root[Chain[v]], 1, CS[Chain[v]], Index[lca]+1, Index[v], X);
+}
+void Get2(int u, int v){
+    sol=-1;
+    int lca=LCA(u,v);
+    while(Chain[u]!=Chain[lca]){
+        Get(root[Chain[u]],1,CS[Chain[u]],1,Index[u]);
+        u=par[Head.ptr[Chain[u]]][0];
+    }
+    Get(root[Chain[u]],1,CS[Chain[u]],Index[lca]+1,Index[u]);
+    while(Chain[v]!=Chain[lca]){
+        Get(root[Chain[v]],1,CS[Chain[v]],1,Index[v]);
+        v=par[Head.ptr[Chain[v]]][0];
+    }
+    Get(root[Chain[v]],1,CS[Chain[v]],Index[lca]+1,Index[v]);
+    if(~sol)
+        done[sol]=1;
 }
 int main(){
-    scanf("%d", &n);
-    g = calloc(n, sizeof(vec));
-    scanf("%d", &m);
-    int q;
-    scanf("%d", &q);
-    vec o = newVec();
-    for (int i = 0; i < n; ++i)
+    Head.ptr = pushback(Head.ptr, &Head.sz, 69);
+    int n, m, q, u, v, i;
+    scanf("%i %i %i", &n, &m, &q);
+    for(i=1; i<=n; i++)
         p[i] = i;
-    for (int i = 0, a, b; i < m; ++i){
-        scanf("%d %d", &a, &b);
-        --a; --b;
-        e[i].first  = a;
-        e[i].second = b;
-        if(find(a) != find(b)){
-            p[find(a)] = find(b);
-            g[a].ptr = pushback(g[a].ptr, &g[a].sz, b);
-            g[b].ptr = pushback(g[b].ptr, &g[b].sz, a);
+    while(m--){
+        scanf("%i %i", &u, &v);
+        if(Find(u)==Find(v)){
+            edges.ptr = pushbackP(edges.ptr, &edges.sz, newPair(u,v));
         }
-        else
-            o.ptr = pushback(o.ptr, &o.sz, i);
+        else{
+            Union(u, v);
+            E[u].ptr = pushback(E[u].ptr, &E[u].sz, v);
+            E[v].ptr = pushback(E[v].ptr, &E[v].sz, u);
+        }
     }
-    memset(dp, -1, sizeof(dp));
-    DFS(0, -1);
-    for(int k = 1; (1 << k) < n; ++k)
-        for(int i = 0; i < n; ++i)
-            if(dp[k - 1][i] != -1)
-                dp[k][i] = dp[k - 1][dp[k - 1][i]];
-    for(int i = 0; i < o.sz; ++i){
-        pair ee = e[o.ptr[i]];
-        int u = ee.first;
-        int v = ee.second;
-        int c = LCA(u, v);
-        add(u, c, o.ptr[i]);
-        add(v, c, o.ptr[i]);
+    DFS(1, 0);
+    HLD(1, 0);
+    for(i=0; i<edges.sz; i++){
+        Set3(edges.ptr[i].first, edges.ptr[i].second, i);
     }
-    int u, v;
-    while (q--){
-        scanf("%d %d", &u, &v);
-        --u; --v;
-        int c = LCA(u, v);
-        if(rem(u, c) || rem(v, c))
-            printf("0 %d %d\n", e[res].first + 1, e[res].second + 1);
+    while(q--){
+        scanf("%i %i", &u, &v);
+        Get2(u, v);
+        if(~sol)
+            printf("0 %i %i\n", edges.ptr[sol].first, edges.ptr[sol].second);
         else
             printf("1\n");
         fflush(stdout);
     }
     return 0;
 }
+
+
