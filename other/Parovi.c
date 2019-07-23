@@ -1,0 +1,90 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<math.h>
+#include<assert.h>
+#include<stdbool.h>
+#include<limits.h>
+
+typedef long long ll;
+
+enum{ MAXL = 50010    };
+enum{ MOD = 1000000007};
+int N;
+char A[MAXL], B[MAXL];
+int mem1[2][2][2][2][MAXL];
+int mem2[2][2][2][2][MAXL];
+
+void load(){
+	char tmp1[MAXL], tmp2[MAXL];
+	scanf("%s%s", tmp1, tmp2);
+	int len1 = strlen(tmp1), len2 = strlen(tmp2);
+	for(int i = 0; i < len2 - len1; ++i)
+		A[i] = '0';
+	for(int i = len2 - len1; i < len2; ++i)
+		A[i] = tmp1[i - len2 + len1];
+	for(int i = 0; i < len2; ++i)
+		B[i] = tmp2[i];
+	N = len2;
+}
+int num(int pos, int d1, int g1, int d2, int g2){
+	if(pos == N)
+        return 1;
+#define	state mem1[d1][g1][d2][g2][pos]
+	if(state != -1) return state;
+	int lo1 = 0, hi1 = 9, lo2 = 0, hi2 = 9;
+	if(d1 == 1) {
+		lo1 = A[pos] - '0';
+	}
+	if(g1 == 1) {
+		hi1 = B[pos] - '0';
+	}
+	if(d2 == 1) lo2 = A[pos] - '0';
+	if(g2 == 1) hi2 = B[pos] - '0';
+	ll ret = 0;
+	for(int x = lo1; x <= hi1; ++x) {
+		for(int y = lo2; y <= hi2; ++y) {
+			int nd1 = 0, ng1 = 0, nd2 = 0, ng2 = 0;
+			if(d1 == 1 && x == lo1) nd1 = 1;			
+			if(g1 == 1 && x == hi1) ng1 = 1;
+			if(d2 == 1 && y == lo2) nd2 = 1;
+			if(g2 == 1 && y == hi2) ng2 = 1;
+			ret += num(pos + 1, nd1, ng1, nd2, ng2);
+		}
+	}
+	return state = ret % MOD;
+    #undef state
+}
+int f(int pos, int d1, int g1, int d2, int g2) {
+	if(pos == N) return 0;
+#define	state mem2[d1][g1][d2][g2][pos]
+	if(state != -1) return state;
+	int lo1 = 0, hi1 = 9, lo2 = 0, hi2 = 9;
+	if(d1 == 1) lo1 = A[pos] - '0';
+	if(g1 == 1) hi1 = B[pos] - '0';
+	if(d2 == 1) lo2 = A[pos] - '0';
+	if(g2 == 1) hi2 = B[pos] - '0';
+	ll ret = 0;
+	for(int x = lo1; x <= hi1; ++x) {
+		for(int y = lo2; y <= hi2; ++y) {
+			int nd1 = 0, ng1 = 0, nd2 = 0, ng2 = 0;
+			if(d1 == 1 && x == lo1) nd1 = 1;
+			if(g1 == 1 && x == hi1) ng1 = 1;
+			if(d2 == 1 && y == lo2) nd2 = 1;
+			if(g2 == 1 && y == hi2) ng2 = 1;
+			ret += (ll)abs(x - y) * num(pos + 1, nd1, ng1, nd2, ng2) % MOD;
+			ret += f(pos + 1, nd1, ng1, nd2, ng2);
+		}
+	}	
+	return state = ret % MOD;
+    #undef state
+}
+int main(){
+	load();
+	memset(mem1, -1, sizeof mem1);
+	memset(mem2, -1, sizeof mem2);
+//	for(int i = 0; i < N; ++i) printf("%c", A[i]); printf("\n");
+//	for(int i = 0; i < N; ++i) printf("%c", B[i]); printf("\n");
+	printf("%d\n", f(0, 1, 1, 1, 1));
+	return 0;
+}
