@@ -15,22 +15,10 @@ pair newpair(int a, int b){
   return(pair){a,b};
 }
 typedef struct{
-  pair first;
-  int  second;
-}trip;  // trip={pair, int}
+  int first, second, third;
+}trip;
 trip newtrip(pair a, int b){
   return(trip){a,b};
-}
-
-typedef struct{
-  int  first;
-  pair second;
-}pip;  // pip = {int, pair}
-pip*mkpip(int a, pair b){
-    pip*rv = calloc(1, sizeof(pip));
-    rv->first =a;
-    rv->second=b;
-    return rv;
 }
 #define pbt(zpv, zvv) zpv.ptr = pushbackT(zpv.ptr, &zpv.sz, zvv)
 #define resizeArray(ptr, type, size) ((type*)realloc(ptr, (size) * sizeof(type)))
