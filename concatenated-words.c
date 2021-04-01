@@ -5,7 +5,7 @@ static const size_t INITIAL_CAPACITY = 16;
 static const size_t MAXIMUM_CAPACITY = (1U << 31);
 static const float  LOAD_FACTOR      = 0.75;
 
-#ifndef HASHMAP_H
+#ifndef HASHMAP_H  // mss
 #define HASHMAP_H
 #include <stdlib.h>
 typedef struct HashMap HashMap;
